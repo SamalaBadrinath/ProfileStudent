@@ -1,0 +1,6 @@
+# Force all .js files to be detected as JavaScript
+*.js linguist-language=JavaScript
+
+# Mark testing and validation scripts as vendor or documentation files so they don't skew code stats
+run_api_tests.js linguist-vendored
+run_validation.js linguist-vendored
