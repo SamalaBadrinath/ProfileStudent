@@ -1,0 +1,13 @@
+{
+  "name": "profilestudent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2026-05-23 --d1=DB",
+    "pages:deploy": "wrangler pages deploy public"
+  },
+  "devDependencies": {
+    "wrangler": "^3.57.1"
+  }
+}

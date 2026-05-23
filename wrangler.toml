@@ -1,0 +1,7 @@
+name = "profilestudent"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "profilestudent-db"
+database_id = "YOUR-D1-DATABASE-UUID-HERE"

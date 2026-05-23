@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProfileStudent - Administrative Operations Portal</title>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Glassmorphism custom styles */
+    .glass-card {
+      background: rgba(30, 41, 59, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-input {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s ease-in-out;
+    }
+    .glass-input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+      outline: none;
+    }
+    .pulse-glow:focus {
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased overflow-x-hidden">
+
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-md w-full"></div>
+
+  <!-- Outer Shell -->
+  <div id="app" class="min-h-full flex flex-col">
+
+    <!-- 1. LOGIN VIEW -->
+    <div id="view-login" class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
+      <!-- Glow Gradients background -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div class="w-full max-w-md space-y-8 z-10">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/5 text-sky-400 text-sm font-medium mb-4">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+            ProfileStudent Administrative Systems
+          </div>
+          <h2 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            Welcome Back
+          </h2>
+          <p class="mt-2 text-sm text-slate-400">
+            Sign in to manage your school profile and student operations
+          </p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 shadow-2xl relative">
+          <form class="space-y-6" id="login-form">
+            <div>
+              <label for="email" class="block text-sm font-medium text-slate-300">Staff Email Address</label>
+              <div class="mt-1">
+                <input id="email" name="email" type="email" required autocomplete="email" placeholder="email@school.edu" 
+                       class="glass-input block w-full px-4 py-3 rounded-xl text-white placeholder-slate-500 text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+              <div class="mt-1">
+                <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" 
+                       class="glass-input block w-full px-4 py-3 rounded-xl text-white placeholder-slate-500 text-sm">
+              </div>
+              <p class="mt-1.5 text-xs text-slate-500">During development phase, any password matches valid emails.</p>
+            </div>
+
+            <div>
+              <button type="submit" id="login-btn"
+                      class="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-900 cursor-pointer">
+                <span>Access Management Console</span>
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <!-- Helpful sample logins box -->
+        <div class="glass-card rounded-xl p-4 border border-slate-800 text-xs text-slate-400 space-y-1.5">
+          <p class="font-semibold text-slate-300 uppercase tracking-wider text-[10px]">Mock Seed Accounts Available:</p>
+          <div class="grid grid-cols-2 gap-2">
+            <div><strong class="text-sky-400">Super Admin:</strong> <span class="select-all">superadmin.a@oakridge.edu</span></div>
+            <div><strong class="text-sky-400">Teacher:</strong> <span class="select-all">teacher.a@oakridge.edu</span></div>
+            <div><strong class="text-sky-400">Fee Counter:</strong> <span class="select-all">feecounter.a@oakridge.edu</span></div>
+            <div><strong class="text-sky-400">Librarian:</strong> <span class="select-all">librarian.a@oakridge.edu</span></div>
+            <div class="col-span-2"><strong class="text-sky-400">Custom Log (LAB):</strong> <span class="select-all">custom.a@oakridge.edu</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MAIN LAYOUT (HIDDEN BY DEFAULT) -->
+    <div id="view-dashboard" class="hidden flex-1 flex flex-col">
+      <!-- Enterprise Header -->
+      <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex items-center justify-between h-16">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 text-sky-400 font-bold text-lg border border-sky-500/20">
+                P
+              </div>
+              <div>
+                <span class="font-extrabold text-white text-lg tracking-tight">ProfileStudent</span>
+                <span id="header-school-name" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700"></span>
+              </div>
+            </div>
+            
+            <div class="flex items-center gap-4">
+              <div class="text-right hidden sm:block">
+                <div id="header-user-name" class="text-sm font-semibold text-white"></div>
+                <div id="header-user-role" class="text-xs text-sky-400 font-medium"></div>
+              </div>
+              
+              <button onclick="appLogout()" 
+                      class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 01-3-3h4a3 3 0 013 3v1"></path></svg>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Container -->
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- DASHBOARD CONTAINER SECTIONS (Toggle display dynamically) -->
+
+        <!-- 2A. SUPER_ADMIN BOARD -->
+        <section id="role-super-admin" class="hidden space-y-8">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight text-white">Administration Workspace</h1>
+              <p class="text-sm text-slate-400">Configure administrative members and staff credentials for your school campus.</p>
+            </div>
+            <button onclick="toggleModal('modal-add-user', true)" 
+                    class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-colors flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+              Register Staff Member
+            </button>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="glass-card rounded-2xl p-6 shadow-lg">
+              <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Registered Staff</span>
+              <div class="text-3xl font-black text-white mt-1" id="stat-staff-count">0</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 shadow-lg">
+              <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Campus Tenant</span>
+              <div class="text-sm font-bold text-sky-400 mt-2 truncate" id="stat-tenant-id">--</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 shadow-lg">
+              <span class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Access Scope</span>
+              <div class="text-sm font-bold text-emerald-400 mt-2">GLOBAL_RESTRICTED</div>
+            </div>
+          </div>
+
+          <!-- Staff Table -->
+          <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
+            <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
+              <h3 class="font-bold text-lg text-white">Campus Staff Directory</h3>
+              <span class="px-2.5 py-1 rounded bg-slate-800 text-xs font-medium text-slate-400 border border-slate-700">D1 Encrypted</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                    <th class="px-6 py-4">Name</th>
+                    <th class="px-6 py-4">Email</th>
+                    <th class="px-6 py-4">Role</th>
+                    <th class="px-6 py-4">Custom Scope</th>
+                    <th class="px-6 py-4 text-right">Identifier</th>
+                  </tr>
+                </thead>
+                <tbody id="table-staff-rows" class="divide-y divide-slate-800 text-sm">
+                  <!-- Dynamic rows go here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2B. TEACHER BOARD -->
+        <section id="role-teacher" class="hidden space-y-8">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight text-white">Teacher Workspace</h1>
+              <p class="text-sm text-slate-400">Manage student directories and logs.</p>
+            </div>
+            <div class="flex gap-3">
+              <button onclick="toggleModal('modal-add-student', true)" 
+                      class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-colors flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                Add Student
+              </button>
+              <button onclick="openCustomLogModal()" 
+                      class="px-4 py-2 rounded-xl text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Post Scope Log
+              </button>
+            </div>
+          </div>
+
+          <!-- Students Directory -->
+          <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
+            <div class="px-6 py-5 border-b border-slate-800">
+              <h3 class="font-bold text-lg text-white">Active Student Roster</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                    <th class="px-6 py-4">Full Name</th>
+                    <th class="px-6 py-4">Email</th>
+                    <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4 text-right">Student ID</th>
+                  </tr>
+                </thead>
+                <tbody id="table-students-rows" class="divide-y divide-slate-800 text-sm">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2C. FEE_COUNTER BOARD -->
+        <section id="role-fee-counter" class="hidden space-y-8">
+          <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white">Fee Counter Ledger</h1>
+            <p class="text-sm text-slate-400">Collect and log student financial dues and school fees.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Collect Dues form -->
+            <div class="glass-card rounded-2xl p-6 shadow-xl h-fit">
+              <h3 class="font-bold text-lg text-white mb-4">Record Dues Payment</h3>
+              <form id="fee-collect-form" class="space-y-4">
+                <div>
+                  <label for="fee-student-select" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Student</label>
+                  <select id="fee-student-select" required 
+                          class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm bg-slate-950">
+                    <option value="" disabled selected>-- Choose Student --</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="fee-amount" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Amount ($)</label>
+                  <input id="fee-amount" type="number" step="0.01" min="0" required placeholder="0.00"
+                         class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm">
+                </div>
+                <div>
+                  <label for="fee-type" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Fee Type</label>
+                  <input id="fee-type" type="text" required placeholder="e.g. Tuition, Sports, Lab"
+                         class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm">
+                </div>
+                <div>
+                  <label for="fee-status" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Payment Status</label>
+                  <select id="fee-status" required 
+                          class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm bg-slate-950">
+                    <option value="PAID" selected>PAID</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="FAILED">FAILED</option>
+                  </select>
+                </div>
+                <button type="submit" 
+                        class="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-slate-950 bg-emerald-400 hover:bg-emerald-300 transition-colors cursor-pointer">
+                  Log Transaction Record
+                </button>
+              </form>
+            </div>
+
+            <!-- Ledger Table -->
+            <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden shadow-xl">
+              <div class="px-6 py-5 border-b border-slate-800">
+                <h3 class="font-bold text-lg text-white">Payment Operations Logs</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                      <th class="px-6 py-4">Student</th>
+                      <th class="px-6 py-4">Fee Category</th>
+                      <th class="px-6 py-4">Amount</th>
+                      <th class="px-6 py-4">Status</th>
+                      <th class="px-6 py-4 text-right">Date Recorded</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-fees-rows" class="divide-y divide-slate-800 text-sm">
+                    <!-- Dynamic fee rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2D. LIBRARIAN BOARD -->
+        <section id="role-librarian" class="hidden space-y-8">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight text-white">Library Asset Tracker</h1>
+              <p class="text-sm text-slate-400">Track book inventories and manage borrow checkouts/returns.</p>
+            </div>
+            <button onclick="toggleModal('modal-borrow-book', true)" 
+                    class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-colors flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+              Issue Book Checkout
+            </button>
+          </div>
+
+          <!-- Book and borrowing grids -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Book Catalog Card -->
+            <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
+              <div class="px-6 py-5 border-b border-slate-800">
+                <h3 class="font-bold text-lg text-white">Library Inventory Catalog</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                      <th class="px-6 py-4">Book Title / Author</th>
+                      <th class="px-6 py-4">ISBN</th>
+                      <th class="px-6 py-4 text-center">Available Copies</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-books-rows" class="divide-y divide-slate-800 text-sm">
+                    <!-- Dynamic books -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Checkout Log Card -->
+            <div class="glass-card rounded-2xl overflow-hidden shadow-xl">
+              <div class="px-6 py-5 border-b border-slate-800">
+                <h3 class="font-bold text-lg text-white">Active Checkout Ledgers</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                      <th class="px-6 py-4">Student</th>
+                      <th class="px-6 py-4">Book</th>
+                      <th class="px-6 py-4">Due Date</th>
+                      <th class="px-6 py-4">Status</th>
+                      <th class="px-6 py-4 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-library-tx-rows" class="divide-y divide-slate-800 text-sm">
+                    <!-- Dynamic transactions -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2E. CUSTOM BOARD -->
+        <section id="role-custom" class="hidden space-y-8">
+          <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-white" id="custom-board-title">Custom Log Entry Console</h1>
+            <p class="text-sm text-slate-400">Append log reports directly to your authorized campus category.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Append form -->
+            <div class="glass-card rounded-2xl p-6 shadow-xl h-fit">
+              <h3 class="font-bold text-lg text-white mb-4">Submit New Entry</h3>
+              <form id="custom-log-form" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Authorized Category Scope</label>
+                  <input id="custom-scope-readonly" type="text" readonly 
+                         class="mt-1 block w-full px-4 py-2.5 rounded-xl text-slate-400 border border-slate-800 bg-slate-900/80 text-sm font-semibold select-none">
+                </div>
+                <div>
+                  <label for="custom-log-text" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Log Description / Report</label>
+                  <textarea id="custom-log-text" required rows="4" placeholder="Input details here..."
+                            class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm resize-none"></textarea>
+                </div>
+                <button type="submit" 
+                        class="w-full mt-2 py-3 px-4 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-colors cursor-pointer">
+                  Append Scope Record
+                </button>
+              </form>
+            </div>
+
+            <!-- Historical Log entries table -->
+            <div class="lg:col-span-2 glass-card rounded-2xl overflow-hidden shadow-xl">
+              <div class="px-6 py-5 border-b border-slate-800">
+                <h3 class="font-bold text-lg text-white">Historical Scope Entries</h3>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/50 border-b border-slate-800 text-slate-400 font-semibold text-xs uppercase tracking-wider">
+                      <th class="px-6 py-4">Logged By</th>
+                      <th class="px-6 py-4">Scope Category</th>
+                      <th class="px-6 py-4">Description</th>
+                      <th class="px-6 py-4 text-right">Timestamp</th>
+                    </tr>
+                  </thead>
+                  <tbody id="table-custom-rows" class="divide-y divide-slate-800 text-sm">
+                    <!-- Dynamic logs -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- DIALOG MODALS -->
+  <!-- ========================================== -->
+
+  <!-- Modal 1: Add User (SUPER_ADMIN) -->
+  <div id="modal-add-user" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-lg text-white">Register Campus User</h3>
+        <button onclick="toggleModal('modal-add-user', false)" class="text-slate-400 hover:text-white cursor-pointer">&times;</button>
+      </div>
+      <form id="add-user-form" class="space-y-4">
+        <div>
+          <label for="new-user-name" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Name</label>
+          <input id="new-user-name" type="text" required placeholder="Staff Name"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div>
+          <label for="new-user-email" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Email Address</label>
+          <input id="new-user-email" type="email" required placeholder="user@school.edu"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div>
+          <label for="new-user-role" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Access Role</label>
+          <select id="new-user-role" required onchange="handleUserRoleChange(this.value)"
+                  class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm bg-slate-950">
+            <option value="TEACHER">TEACHER</option>
+            <option value="FEE_COUNTER">FEE_COUNTER</option>
+            <option value="LIBRARIAN">LIBRARIAN</option>
+            <option value="CUSTOM">CUSTOM</option>
+          </select>
+        </div>
+        <!-- Shown dynamically ONLY for CUSTOM roles -->
+        <div id="wrapper-custom-scope" class="hidden">
+          <label for="new-user-scope" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Custom Role Scope</label>
+          <input id="new-user-scope" type="text" placeholder="e.g. LAB, SPORTS, COMPUTER"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="toggleModal('modal-add-user', false)"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 cursor-pointer">
+            Register Account
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Add Student (TEACHER) -->
+  <div id="modal-add-student" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-lg text-white">Enroll Student Profile</h3>
+        <button onclick="toggleModal('modal-add-student', false)" class="text-slate-400 hover:text-white cursor-pointer">&times;</button>
+      </div>
+      <form id="add-student-form" class="space-y-4">
+        <div>
+          <label for="new-stud-first" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">First Name</label>
+          <input id="new-stud-first" type="text" required placeholder="First Name"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div>
+          <label for="new-stud-last" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Last Name</label>
+          <input id="new-stud-last" type="text" required placeholder="Last Name"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div>
+          <label for="new-stud-email" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Student Email</label>
+          <input id="new-stud-email" type="email" placeholder="student@school.edu"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="toggleModal('modal-add-student', false)"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 cursor-pointer">
+            Enroll Student
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Issue Book Checkout (LIBRARIAN) -->
+  <div id="modal-borrow-book" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-lg text-white">Checkout Book Transaction</h3>
+        <button onclick="toggleModal('modal-borrow-book', false)" class="text-slate-400 hover:text-white cursor-pointer">&times;</button>
+      </div>
+      <form id="borrow-book-form" class="space-y-4">
+        <div>
+          <label for="borrow-student-select" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Student</label>
+          <select id="borrow-student-select" required
+                  class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm bg-slate-950">
+            <option value="" disabled selected>-- Choose Student --</option>
+          </select>
+        </div>
+        <div>
+          <label for="borrow-book-select" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Select Book Title</label>
+          <select id="borrow-book-select" required
+                  class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm bg-slate-950">
+            <option value="" disabled selected>-- Choose Book --</option>
+          </select>
+        </div>
+        <div>
+          <label for="borrow-days" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Borrow Duration (Days)</label>
+          <input id="borrow-days" type="number" min="1" max="90" value="14" required
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="toggleModal('modal-borrow-book', false)"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 cursor-pointer">
+            Checkout Asset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: Dispatch Custom Scope Log (TEACHER) -->
+  <div id="modal-teacher-log" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-lg text-white">Submit Scope Log</h3>
+        <button onclick="toggleModal('modal-teacher-log', false)" class="text-slate-400 hover:text-white cursor-pointer">&times;</button>
+      </div>
+      <form id="teacher-log-form" class="space-y-4">
+        <div>
+          <label for="teacher-log-scope" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Scope category</label>
+          <input id="teacher-log-scope" type="text" required placeholder="e.g. SPORTS, ACADEMICS, LAB"
+                 class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm">
+        </div>
+        <div>
+          <label for="teacher-log-desc" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Report Description</label>
+          <textarea id="teacher-log-desc" required rows="4" placeholder="Log details..."
+                    class="mt-1 glass-input block w-full px-4 py-2 rounded-xl text-white text-sm resize-none"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+          <button type="button" onclick="toggleModal('modal-teacher-log', false)"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white bg-slate-900 border border-slate-800 cursor-pointer">
+            Cancel
+          </button>
+          <button type="submit"
+                  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 cursor-pointer">
+            Dispatch Log
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- STATE & APPLICATION CORE LOGIC (VANILLA JS) -->
+  <!-- ========================================== -->
+  <script>
+    // Global state
+    const appState = {
+      user: null, // logged-in user profile
+      view: 'LOGIN',
+      data: {
+        staff: [],
+        students: [],
+        fees: [],
+        books: [],
+        libraryTx: [],
+        customLogs: []
+      }
+    };
+
+    // Initialize application
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check for saved session in localStorage
+      const cachedUser = localStorage.getItem('user');
+      if (cachedUser) {
+        try {
+          appState.user = JSON.parse(cachedUser);
+          appState.view = appState.user.role;
+          syncHeader();
+          setView(appState.view);
+          fetchDashboardData();
+        } catch (e) {
+          localStorage.removeItem('user');
+          setView('LOGIN');
+        }
+      } else {
+        setView('LOGIN');
+      }
+
+      // Hook up login form
+      const loginForm = document.getElementById('login-form');
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const submitBtn = document.getElementById('login-btn');
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').innerText = "Verifying Credentials...";
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+
+          const data = await res.json();
+          if (res.status === 200) {
+            showToast('Welcome back, ' + data.user.name + '!', 'success');
+            appState.user = data.user;
+            localStorage.setItem('user', JSON.stringify(data.user));
+            appState.view = data.user.role;
+            syncHeader();
+            setView(appState.view);
+            fetchDashboardData();
+          } else {
+            showToast(data.error || 'Authentication failed', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to connect to authentication server', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').innerText = "Access Management Console";
+        }
+      });
+
+      // Hook up dynamic submit forms
+      document.getElementById('add-user-form').addEventListener('submit', (e) => handleFormSubmit(e, '/api/users', 'modal-add-user', fetchDashboardData));
+      document.getElementById('add-student-form').addEventListener('submit', (e) => handleFormSubmit(e, '/api/students', 'modal-add-student', fetchDashboardData));
+      document.getElementById('borrow-book-form').addEventListener('submit', (e) => handleLibraryBorrowSubmit(e));
+      document.getElementById('fee-collect-form').addEventListener('submit', (e) => handleFeeSubmit(e));
+      document.getElementById('custom-log-form').addEventListener('submit', (e) => handleCustomLogSubmit(e));
+      document.getElementById('teacher-log-form').addEventListener('submit', (e) => handleTeacherLogSubmit(e));
+    });
+
+    // Toast alerts helper
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const colors = type === 'success' 
+        ? 'bg-slate-900 border-emerald-500/30 text-emerald-400 shadow-emerald-950/20' 
+        : 'bg-slate-900 border-rose-500/30 text-rose-400 shadow-rose-950/20';
+
+      toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 ${colors}`;
+      toast.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${type === 'success' ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
+        <span class="flex-1 text-slate-200">${message}</span>
+      `;
+
+      container.appendChild(toast);
+      
+      // Animate entry
+      setTimeout(() => {
+        toast.classList.remove('translate-x-12', 'opacity-0');
+      }, 50);
+
+      // Remove after 4s
+      setTimeout(() => {
+        toast.classList.add('translate-x-12', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Toggle Modal Window visibility
+    function toggleModal(modalId, show) {
+      const modal = document.getElementById(modalId);
+      if (show) {
+        modal.classList.remove('hidden');
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Adjust user fields inside SUPER_ADMIN user registration modal
+    function handleUserRoleChange(role) {
+      const scopeWrapper = document.getElementById('wrapper-custom-scope');
+      if (role === 'CUSTOM') {
+        scopeWrapper.classList.remove('hidden');
+        document.getElementById('new-user-scope').required = true;
+      } else {
+        scopeWrapper.classList.add('hidden');
+        document.getElementById('new-user-scope').required = false;
+        document.getElementById('new-user-scope').value = '';
+      }
+    }
+
+    // Set active routing view
+    function setView(viewName) {
+      // Hide all main elements
+      document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('role-super-admin').classList.add('hidden');
+      document.getElementById('role-teacher').classList.add('hidden');
+      document.getElementById('role-fee-counter').classList.add('hidden');
+      document.getElementById('role-librarian').classList.add('hidden');
+      document.getElementById('role-custom').classList.add('hidden');
+
+      if (viewName === 'LOGIN') {
+        document.getElementById('view-login').classList.remove('hidden');
+      } else {
+        document.getElementById('view-dashboard').classList.remove('hidden');
+        const boardSection = document.getElementById(`role-${viewName.toLowerCase().replace(/_/g, '-')}`);
+        if (boardSection) {
+          boardSection.classList.remove('hidden');
+        }
+      }
+    }
+
+    // Header synchronization
+    function syncHeader() {
+      if (appState.user) {
+        document.getElementById('header-school-name').innerText = appState.user.school_name || 'Campus Tenant';
+        document.getElementById('header-user-name').innerText = appState.user.name;
+        document.getElementById('header-user-role').innerText = appState.user.role + (appState.user.custom_role_scope ? ` (${appState.user.custom_role_scope})` : '');
+      }
+    }
+
+    // Logout logic
+    function appLogout() {
+      // Expire auth cookie
+      document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      localStorage.removeItem('user');
+      appState.user = null;
+      setView('LOGIN');
+      showToast('Logged out successfully', 'success');
+    }
+
+    // Fetch dashboard domain details from APIs
+    async function fetchDashboardData() {
+      if (!appState.user) return;
+      const role = appState.user.role;
+
+      try {
+        if (role === 'SUPER_ADMIN') {
+          // Fetch school staff list
+          const staffRes = await apiFetch('/api/users');
+          if (staffRes) {
+            appState.data.staff = staffRes;
+            document.getElementById('stat-staff-count').innerText = staffRes.length;
+            document.getElementById('stat-tenant-id').innerText = appState.user.school_id;
+            renderStaffTable();
+          }
+        } else if (role === 'TEACHER') {
+          // Fetch student roster
+          const studRes = await apiFetch('/api/students');
+          if (studRes) {
+            appState.data.students = studRes;
+            renderStudentsTable();
+          }
+        } else if (role === 'FEE_COUNTER') {
+          // Fetch students directory for the dropdown selection
+          const studRes = await apiFetch('/api/students');
+          if (studRes) {
+            appState.data.students = studRes;
+            populateStudentDropdown('fee-student-select', studRes);
+          }
+          // Fetch payments ledger list
+          const feeLogs = await apiFetch('/api/fees');
+          if (feeLogs) {
+            appState.data.fees = feeLogs;
+            renderFeesTable();
+          }
+        } else if (role === 'LIBRARIAN') {
+          // Fetch students directory for dropdown
+          const studRes = await apiFetch('/api/students');
+          if (studRes) {
+            appState.data.students = studRes;
+            populateStudentDropdown('borrow-student-select', studRes);
+          }
+          // Fetch catalog books list
+          const booksList = await apiFetch('/api/library?type=books');
+          if (booksList) {
+            appState.data.books = booksList;
+            renderBooksTable();
+            populateBookDropdown('borrow-book-select', booksList);
+          }
+          // Fetch active checkouts
+          const libraryLogs = await apiFetch('/api/library?type=transactions');
+          if (libraryLogs) {
+            appState.data.libraryTx = libraryLogs;
+            renderLibraryTxTable();
+          }
+        } else if (role === 'CUSTOM') {
+          // Config scope fields
+          document.getElementById('custom-board-title').innerText = `${appState.user.custom_role_scope} Workspace Logs`;
+          document.getElementById('custom-scope-readonly').value = appState.user.custom_role_scope;
+          // Fetch logs matching this category
+          const customLogsList = await apiFetch('/api/custom');
+          if (customLogsList) {
+            appState.data.customLogs = customLogsList;
+            renderCustomLogsTable();
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // Helper client handler around standard fetch api
+    async function apiFetch(endpoint, options = {}) {
+      try {
+        const res = await fetch(endpoint, options);
+        if (res.status === 401) {
+          showToast('Session expired. Please log in again.', 'error');
+          appLogout();
+          return null;
+        }
+        if (res.status === 403) {
+          showToast('Access denied: Unauthorized operation.', 'error');
+          return null;
+        }
+        if (res.status === 404) {
+          showToast('Resource not found', 'error');
+          return null;
+        }
+        if (!res.ok) {
+          const body = await res.json();
+          showToast(body.error || 'Server error', 'error');
+          return null;
+        }
+        return await res.json();
+      } catch (err) {
+        showToast('Network error: Failed to connect to server', 'error');
+        return null;
+      }
+    }
+
+    // ==========================================
+    // RENDER FUNCTIONS (DOM Injection)
+    // ==========================================
+
+    function renderStaffTable() {
+      const container = document.getElementById('table-staff-rows');
+      container.innerHTML = '';
+      if (appState.data.staff.length === 0) {
+        container.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No staff members registered. Click "Register Staff Member" to add one.</td></tr>`;
+        return;
+      }
+      appState.data.staff.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/30 transition-colors";
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-medium text-white">${item.name}</td>
+          <td class="px-6 py-4 text-slate-300">${item.email}</td>
+          <td class="px-6 py-4"><span class="px-2 py-0.5 rounded text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">${item.role}</span></td>
+          <td class="px-6 py-4 text-slate-400">${item.custom_role_scope || '--'}</td>
+          <td class="px-6 py-4 text-right font-mono text-xs text-slate-500">${item.id}</td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    function renderStudentsTable() {
+      const container = document.getElementById('table-students-rows');
+      container.innerHTML = '';
+      if (appState.data.students.length === 0) {
+        container.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No students enrolled yet. Click "Add Student" to create a profile.</td></tr>`;
+        return;
+      }
+      appState.data.students.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/30 transition-colors";
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-medium text-white">${item.first_name} ${item.last_name}</td>
+          <td class="px-6 py-4 text-slate-300">${item.email || '--'}</td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-0.5 rounded text-xs font-semibold ${item.enrollment_status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800 text-slate-400'} border">
+              ${item.enrollment_status}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-right font-mono text-xs text-slate-500">${item.id}</td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    function renderFeesTable() {
+      const container = document.getElementById('table-fees-rows');
+      container.innerHTML = '';
+      if (appState.data.fees.length === 0) {
+        container.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No ledger transactions logged.</td></tr>`;
+        return;
+      }
+      appState.data.fees.forEach(item => {
+        const statusColors = item.payment_status === 'PAID' 
+          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+          : item.payment_status === 'PENDING'
+            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+            : 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/30 transition-colors";
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-medium text-white">${item.first_name} ${item.last_name}</td>
+          <td class="px-6 py-4 text-slate-300">${item.fee_type}</td>
+          <td class="px-6 py-4 font-semibold text-slate-200">$${item.amount.toFixed(2)}</td>
+          <td class="px-6 py-4"><span class="px-2 py-0.5 rounded text-xs font-semibold border ${statusColors}">${item.payment_status}</span></td>
+          <td class="px-6 py-4 text-right text-xs text-slate-500">${new Date(item.payment_date).toLocaleString()}</td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    function renderBooksTable() {
+      const container = document.getElementById('table-books-rows');
+      container.innerHTML = '';
+      if (appState.data.books.length === 0) {
+        container.innerHTML = `<tr><td colspan="3" class="px-6 py-8 text-center text-slate-500">No books cataloged in system.</td></tr>`;
+        return;
+      }
+      appState.data.books.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/30 transition-colors";
+        tr.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="font-medium text-white">${item.title}</div>
+            <div class="text-xs text-slate-400">${item.author}</div>
+          </td>
+          <td class="px-6 py-4 text-slate-300 font-mono text-xs">${item.isbn || '--'}</td>
+          <td class="px-6 py-4 text-center font-bold text-slate-200">
+            <span class="${item.available_copies > 0 ? 'text-sky-400' : 'text-rose-500'}">
+              ${item.available_copies}
+            </span> / ${item.total_copies}
+          </td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    function renderLibraryTxTable() {
+      const container = document.getElementById('table-library-tx-rows');
+      container.innerHTML = '';
+      if (appState.data.libraryTx.length === 0) {
+        container.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">No books checked out currently.</td></tr>`;
+        return;
+      }
+      appState.data.libraryTx.forEach(item => {
+        const isBorrowed = item.status === 'BORROWED';
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/30 transition-colors";
+        
+        let actionBtn = '--';
+        if (isBorrowed) {
+          actionBtn = `
+            <button onclick="returnBook('${item.id}')"
+                    class="px-2.5 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:text-white transition-colors text-xs font-semibold cursor-pointer">
+              Return Book
+            </button>
+          `;
+        }
+
+        tr.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="font-medium text-white">${item.first_name} ${item.last_name}</div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="font-medium text-slate-200">${item.title}</div>
+            <div class="text-xs text-slate-400">${item.author}</div>
+          </td>
+          <td class="px-6 py-4 text-slate-300 text-xs">${new Date(item.due_date).toLocaleDateString()}</td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-0.5 rounded text-xs font-semibold border ${isBorrowed ? 'bg-sky-500/10 text-sky-400 border-sky-500/20' : 'bg-slate-800 text-slate-400 border-slate-700'}">
+              ${item.status}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-right">${actionBtn}</td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    function renderCustomLogsTable() {
+      const container = document.getElementById('table-custom-rows');
+      container.innerHTML = '';
+      if (appState.data.customLogs.length === 0) {
+        container.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No log entries recorded.</td></tr>`;
+        return;
+      }
+      appState.data.customLogs.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/30 transition-colors";
+        tr.innerHTML = `
+          <td class="px-6 py-4 text-slate-400 font-mono text-xs">${item.user_id}</td>
+          <td class="px-6 py-4"><span class="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-300 font-semibold border border-slate-700">${item.scope}</span></td>
+          <td class="px-6 py-4 text-slate-200 font-medium">${item.log_entry}</td>
+          <td class="px-6 py-4 text-right text-xs text-slate-500">${new Date(item.created_at).toLocaleString()}</td>
+        `;
+        container.appendChild(tr);
+      });
+    }
+
+    // Dropdowns populator
+    function populateStudentDropdown(selectId, students) {
+      const select = document.getElementById(selectId);
+      select.innerHTML = '<option value="" disabled selected>-- Choose Student --</option>';
+      students.forEach(s => {
+        if (s.enrollment_status === 'ACTIVE') {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.innerText = `${s.first_name} ${s.last_name}`;
+          select.appendChild(opt);
+        }
+      });
+    }
+
+    function populateBookDropdown(selectId, books) {
+      const select = document.getElementById(selectId);
+      select.innerHTML = '<option value="" disabled selected>-- Choose Book --</option>';
+      books.forEach(b => {
+        if (b.available_copies > 0) {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          opt.innerText = `${b.title} (${b.available_copies} available)`;
+          select.appendChild(opt);
+        }
+      });
+    }
+
+    // ==========================================
+    // ACTION CONTROLLERS & FORM SUBMIT HANDLERS
+    // ==========================================
+
+    // Generic form submit handler
+    async function handleFormSubmit(e, endpoint, modalId, onSuccess) {
+      e.preventDefault();
+      const form = e.target;
+      
+      // Serialize form to object
+      const formData = {};
+      new FormData(form).forEach((value, key) => {
+        formData[key] = value;
+      });
+
+      const res = await apiFetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (res) {
+        showToast(res.message || 'Operation successful', 'success');
+        form.reset();
+        toggleModal(modalId, false);
+        if (onSuccess) onSuccess();
+      }
+    }
+
+    // Record fee submission
+    async function handleFeeSubmit(e) {
+      e.preventDefault();
+      const student_id = document.getElementById('fee-student-select').value;
+      const amount = parseFloat(document.getElementById('fee-amount').value);
+      const fee_type = document.getElementById('fee-type').value.trim();
+      const payment_status = document.getElementById('fee-status').value;
+
+      const res = await apiFetch('/api/fees', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ student_id, amount, fee_type, payment_status })
+      });
+
+      if (res) {
+        showToast(res.message || 'Fee payment recorded', 'success');
+        document.getElementById('fee-collect-form').reset();
+        fetchDashboardData();
+      }
+    }
+
+    // Library borrow checkout
+    async function handleLibraryBorrowSubmit(e) {
+      e.preventDefault();
+      const student_id = document.getElementById('borrow-student-select').value;
+      const book_id = document.getElementById('borrow-book-select').value;
+      const days = parseInt(document.getElementById('borrow-days').value) || 14;
+
+      const res = await apiFetch('/api/library', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'BORROW', student_id, book_id, days_to_due: days })
+      });
+
+      if (res) {
+        showToast(res.message || 'Book checked out successfully', 'success');
+        document.getElementById('borrow-book-form').reset();
+        toggleModal('modal-borrow-book', false);
+        fetchDashboardData();
+      }
+    }
+
+    // Return library book transaction
+    async function returnBook(txId) {
+      if (!confirm('Mark this checked out book as returned?')) return;
+      const res = await apiFetch('/api/library', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'RETURN', transaction_id: txId })
+      });
+      if (res) {
+        showToast(res.message || 'Book returned successfully', 'success');
+        fetchDashboardData();
+      }
+    }
+
+    // Custom scope logs submission (CUSTOM role)
+    async function handleCustomLogSubmit(e) {
+      e.preventDefault();
+      const scope = appState.user.custom_role_scope;
+      const log_entry = document.getElementById('custom-log-text').value.trim();
+
+      const res = await apiFetch('/api/custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scope, log_entry })
+      });
+
+      if (res) {
+        showToast(res.message || 'Scope log appended successfully', 'success');
+        document.getElementById('custom-log-text').value = '';
+        fetchDashboardData();
+      }
+    }
+
+    // Teacher log modal opener
+    function openCustomLogModal() {
+      toggleModal('modal-teacher-log', true);
+    }
+
+    // Teacher log dispatcher (TEACHER role)
+    async function handleTeacherLogSubmit(e) {
+      e.preventDefault();
+      const scope = document.getElementById('teacher-log-scope').value.trim().toUpperCase();
+      const log_entry = document.getElementById('teacher-log-desc').value.trim();
+
+      const res = await apiFetch('/api/custom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scope, log_entry })
+      });
+
+      if (res) {
+        showToast(res.message || 'Scope log dispatched successfully', 'success');
+        document.getElementById('teacher-log-form').reset();
+        toggleModal('modal-teacher-log', false);
+      }
+    }
+  </script>
+</body>
+</html>
