@@ -50,7 +50,25 @@
   <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-md w-full"></div>
 
   <!-- Outer Shell -->
-  <div id="app" class="min-h-full flex flex-col">
+  <div id="app" class="min-h-full flex flex-col pt-16 pb-12">
+    <!-- Global Header -->
+    <header class="fixed top-0 left-0 right-0 h-16 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between">
+        <!-- Logo -->
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 text-sky-400 font-bold text-lg border border-sky-500/20">
+            P
+          </div>
+          <div>
+            <span class="font-extrabold text-white text-lg tracking-tight select-none">ProfileStudent</span>
+          </div>
+        </div>
+        <!-- Dynamic Header Menu -->
+        <div id="global-header-right" class="flex items-center gap-4">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+    </header>
 
     <!-- 1. LOGIN VIEW -->
     <div id="view-login" class="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
@@ -83,7 +101,10 @@
             </div>
 
             <div>
-              <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+              <div class="flex items-center justify-between">
+                <label for="password" class="block text-sm font-medium text-slate-300">Password</label>
+                <button type="button" onclick="openResetModal()" class="text-xs text-sky-400 hover:text-sky-300 font-semibold cursor-pointer underline">Forgot Password?</button>
+              </div>
               <div class="mt-1">
                 <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••" 
                        class="glass-input block w-full px-4 py-3 rounded-xl text-white placeholder-slate-500 text-sm">
@@ -180,35 +201,7 @@
 
     <!-- 2. MAIN LAYOUT (HIDDEN BY DEFAULT) -->
     <div id="view-dashboard" class="hidden flex-1 flex flex-col">
-      <!-- Enterprise Header -->
-      <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur-md sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex items-center justify-between h-16">
-            <div class="flex items-center gap-3">
-              <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 text-sky-400 font-bold text-lg border border-sky-500/20">
-                P
-              </div>
-              <div>
-                <span class="font-extrabold text-white text-lg tracking-tight">ProfileStudent</span>
-                <span id="header-school-name" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700"></span>
-              </div>
-            </div>
-            
-            <div class="flex items-center gap-4">
-              <div class="text-right hidden sm:block">
-                <div id="header-user-name" class="text-sm font-semibold text-white"></div>
-                <div id="header-user-role" class="text-xs text-sky-400 font-medium"></div>
-              </div>
-              
-              <button onclick="appLogout()" 
-                      class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-900 border border-slate-800 hover:border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 01-3-3h4a3 3 0 013 3v1"></path></svg>
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <!-- Global Header replaces the inner Enterprise Header -->
 
       <!-- Main Content Container -->
       <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -502,6 +495,15 @@
 
       </main>
     </div>
+    
+    <!-- Global Footer -->
+    <footer class="fixed bottom-0 left-0 right-0 h-10 bg-slate-950 text-slate-500 text-[10px] md:text-xs border-t border-slate-900/50 z-45 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+      <span>© 2026 ProfileStudent. All rights reserved. | Multi-Tenant Serverless Architecture</span>
+      <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-medium border border-emerald-500/20">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        Edge Node Status: Optimal (APAC)
+      </span>
+    </footer>
   </div>
 
   <!-- ========================================== -->
@@ -666,6 +668,52 @@
     </div>
   </div>
 
+  <!-- Modal 5: Password Reset Subsystem (Step 1 & Step 2) -->
+  <div id="modal-reset-password" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 relative">
+      <button onclick="closeResetModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold cursor-pointer">&times;</button>
+      <div class="border-b border-slate-800 pb-3 text-center">
+        <h3 class="font-bold text-lg text-white">Reset Account Password</h3>
+        <p class="text-xs text-slate-400 mt-1">Multi-tenant credentials verification gateway</p>
+      </div>
+      
+      <!-- Step 1 Form: Request Verification Code -->
+      <form id="reset-request-form" class="space-y-4">
+        <div>
+          <label for="reset-email" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Staff Email Address</label>
+          <input id="reset-email" type="email" required placeholder="email@school.edu"
+                 class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm">
+        </div>
+        <button type="submit" id="reset-request-btn"
+                class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-all cursor-pointer flex justify-center items-center">
+          <span>Request Reset Key</span>
+        </button>
+      </form>
+
+      <!-- Step 2 Form: Verify Key & Update Password -->
+      <form id="reset-verify-form" class="hidden space-y-4">
+        <div class="bg-sky-500/10 border border-sky-500/20 text-sky-400 rounded-xl p-3 text-xs space-y-1">
+          <p class="font-semibold text-sky-300">Sandbox Simulation Dispatch:</p>
+          <p>Because there is no email relay configured in this environment, your reset key is: <strong id="demo-token-display" class="font-mono select-all text-sm underline text-white">XXXXXX</strong></p>
+        </div>
+        <div>
+          <label for="reset-key" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">6-Character Key</label>
+          <input id="reset-key" type="text" required placeholder="e.g. ABC123" maxlength="6"
+                 class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm font-mono tracking-widest uppercase">
+        </div>
+        <div>
+          <label for="reset-new-password" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">New Password</label>
+          <input id="reset-new-password" type="password" required placeholder="••••••••"
+                 class="mt-1 glass-input block w-full px-4 py-2.5 rounded-xl text-white text-sm">
+        </div>
+        <button type="submit" id="reset-verify-btn"
+                class="w-full py-2.5 px-4 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-all cursor-pointer flex justify-center items-center">
+          <span>Update Password</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- ========================================== -->
   <!-- STATE & APPLICATION CORE LOGIC (VANILLA JS) -->
   <!-- ========================================== -->
@@ -787,6 +835,76 @@
           submitBtn.querySelector('span').innerText = "Onboard School & Admin";
         }
       });
+
+      // Reset Password Step 1: Request
+      document.getElementById('reset-request-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reset-email').value.trim();
+        const submitBtn = document.getElementById('reset-request-btn');
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').innerText = "Requesting Reset...";
+
+        try {
+          const res = await fetch('/api/auth/request-reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+          });
+          const data = await res.json();
+          if (res.status === 200) {
+            showToast('Verification key generated.', 'success');
+            document.getElementById('reset-request-form').classList.add('hidden');
+            document.getElementById('reset-verify-form').classList.remove('hidden');
+            if (data.mockDeliveryToken) {
+              document.getElementById('demo-token-display').innerText = data.mockDeliveryToken;
+            }
+          } else {
+            showToast(data.error || 'Failed to request reset', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to connect to reset server', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').innerText = "Request Reset Key";
+        }
+      });
+
+      // Reset Password Step 2: Verify & Update
+      document.getElementById('reset-verify-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('reset-email').value.trim();
+        const verificationKey = document.getElementById('reset-key').value.trim().toUpperCase();
+        const newPassword = document.getElementById('reset-new-password').value;
+        const submitBtn = document.getElementById('reset-verify-btn');
+        
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').innerText = "Updating Password...";
+
+        try {
+          const res = await fetch('/api/auth/verify-reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, verificationKey, newPassword })
+          });
+          const data = await res.json();
+          if (res.status === 200) {
+            showToast('Password updated successfully! Please log in.', 'success');
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = '';
+            closeResetModal();
+            setView('LOGIN');
+          } else {
+            showToast(data.error || 'Password reset failed', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to connect to reset server', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').innerText = "Update Password";
+        }
+      });
     });
 
     // Toast alerts helper
@@ -864,15 +982,66 @@
           boardSection.classList.remove('hidden');
         }
       }
+      syncHeader();
     }
 
     // Header synchronization
     function syncHeader() {
+      const rightArea = document.getElementById('global-header-right');
+      if (!rightArea) return;
+
       if (appState.user) {
-        document.getElementById('header-school-name').innerText = appState.user.school_name || 'Campus Tenant';
-        document.getElementById('header-user-name').innerText = appState.user.name;
-        document.getElementById('header-user-role').innerText = appState.user.role + (appState.user.custom_role_scope ? ` (${appState.user.custom_role_scope})` : '');
+        // Authenticated view
+        const schoolName = appState.user.school_name || 'Campus Tenant';
+        const userTag = `[${appState.user.role}] ${appState.user.email}`;
+        
+        rightArea.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="hidden md:inline-block text-xs font-semibold px-2.5 py-1 rounded-xl bg-slate-800 text-slate-400 border border-slate-700 select-none">
+              ${schoolName}
+            </span>
+            <span class="text-[10px] md:text-xs text-slate-300 font-medium font-mono bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-xl select-all">
+              ${userTag}
+            </span>
+            <button onclick="appLogout()" 
+                    class="px-3 py-1.5 rounded-lg text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-all flex items-center gap-1 cursor-pointer">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 01-3-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            </button>
+          </div>
+        `;
+      } else {
+        // Unauthenticated view
+        const isRegisterView = !document.getElementById('view-register').classList.contains('hidden');
+        if (!isRegisterView) {
+          rightArea.innerHTML = `
+            <button onclick="setView('REGISTER')" class="px-4 py-1.5 rounded-xl text-xs font-semibold text-sky-400 hover:text-sky-300 bg-sky-500/5 hover:bg-sky-500/10 border border-sky-500/20 hover:border-sky-500/30 transition-all cursor-pointer">
+              Register School
+            </button>
+          `;
+        } else {
+          rightArea.innerHTML = `
+            <button onclick="setView('LOGIN')" class="px-4 py-1.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 transition-all cursor-pointer">
+              Back to Login
+            </button>
+          `;
+        }
       }
+    }
+
+    // Modal controllers for Password Reset Modal
+    function openResetModal() {
+      document.getElementById('modal-reset-password').classList.remove('hidden');
+      document.getElementById('reset-request-form').classList.remove('hidden');
+      document.getElementById('reset-verify-form').classList.add('hidden');
+      document.getElementById('reset-email').value = document.getElementById('email').value;
+      document.getElementById('reset-request-form').reset();
+    }
+
+    function closeResetModal() {
+      document.getElementById('modal-reset-password').classList.add('hidden');
     }
 
     // Logout logic
