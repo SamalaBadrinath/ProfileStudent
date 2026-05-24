@@ -97,6 +97,11 @@
                 <span>Access Management Console</span>
               </button>
             </div>
+
+            <p class="mt-4 text-center text-xs text-slate-400">
+              Don't have an account? 
+              <button type="button" onclick="setView('REGISTER')" class="text-sky-400 hover:text-sky-300 font-semibold cursor-pointer underline">Register your school</button>
+            </p>
           </form>
         </div>
         
@@ -110,6 +115,76 @@
             <div><strong class="text-sky-400">Librarian:</strong> <span class="select-all">librarian.a@oakridge.edu</span></div>
             <div class="col-span-2"><strong class="text-sky-400">Custom Log (LAB):</strong> <span class="select-all">custom.a@oakridge.edu</span></div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1B. REGISTRATION VIEW -->
+    <div id="view-register" class="hidden flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 relative overflow-hidden">
+      <!-- Glow Gradients background -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-sky-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+      <div class="w-full max-w-md space-y-8 z-10">
+        <div class="text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-sky-500/30 bg-sky-500/5 text-sky-400 text-sm font-medium mb-4">
+            <span class="w-2 h-2 rounded-full bg-sky-400 animate-ping"></span>
+            ProfileStudent Administrative Systems
+          </div>
+          <h2 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            Register School
+          </h2>
+          <p class="mt-2 text-sm text-slate-400">
+            Set up your school tenant and administrator profile
+          </p>
+        </div>
+
+        <div class="glass-card rounded-2xl p-8 shadow-2xl relative">
+          <form class="space-y-4" id="register-form">
+            <div>
+              <label for="reg-school-name" class="block text-sm font-medium text-slate-300">School / Academy Name</label>
+              <div class="mt-1">
+                <input id="reg-school-name" name="schoolName" type="text" required placeholder="e.g. Hogwarts Academy" 
+                       class="glass-input block w-full px-4 py-2.5 rounded-xl text-white placeholder-slate-500 text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label for="reg-admin-name" class="block text-sm font-medium text-slate-300">Administrator Full Name</label>
+              <div class="mt-1">
+                <input id="reg-admin-name" name="adminName" type="text" required placeholder="John Doe" 
+                       class="glass-input block w-full px-4 py-2.5 rounded-xl text-white placeholder-slate-500 text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label for="reg-email" class="block text-sm font-medium text-slate-300">Admin Email Address</label>
+              <div class="mt-1">
+                <input id="reg-email" name="email" type="email" required placeholder="admin@school.edu" 
+                       class="glass-input block w-full px-4 py-2.5 rounded-xl text-white placeholder-slate-500 text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label for="reg-password" class="block text-sm font-medium text-slate-300">Password</label>
+              <div class="mt-1">
+                <input id="reg-password" name="password" type="password" required placeholder="••••••••" 
+                       class="glass-input block w-full px-4 py-2.5 rounded-xl text-white placeholder-slate-500 text-sm">
+              </div>
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" id="register-btn"
+                      class="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-900 cursor-pointer">
+                <span>Onboard School & Admin</span>
+              </button>
+            </div>
+            
+            <p class="mt-4 text-center text-xs text-slate-400">
+              Already have an account? 
+              <button type="button" onclick="setView('LOGIN')" class="text-sky-400 hover:text-sky-300 font-semibold cursor-pointer underline">Back to Login</button>
+            </p>
+          </form>
         </div>
       </div>
     </div>
@@ -686,6 +761,43 @@
       document.getElementById('fee-collect-form').addEventListener('submit', (e) => handleFeeSubmit(e));
       document.getElementById('custom-log-form').addEventListener('submit', (e) => handleCustomLogSubmit(e));
       document.getElementById('teacher-log-form').addEventListener('submit', (e) => handleTeacherLogSubmit(e));
+
+      // Hook up register form
+      const registerForm = document.getElementById('register-form');
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const schoolName = document.getElementById('reg-school-name').value.trim();
+        const adminName = document.getElementById('reg-admin-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const submitBtn = document.getElementById('register-btn');
+        
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').innerText = "Registering School...";
+
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ schoolName, adminName, email, password })
+          });
+
+          const data = await res.json();
+          if (res.status === 201) {
+            showToast('School onboarded successfully! Please log in.', 'success');
+            document.getElementById('email').value = email;
+            setView('LOGIN');
+          } else {
+            showToast(data.error || 'Registration failed', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to connect to registration server', 'error');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').innerText = "Onboard School & Admin";
+        }
+      });
     });
 
     // Toast alerts helper
@@ -744,6 +856,7 @@
     function setView(viewName) {
       // Hide all main elements
       document.getElementById('view-login').classList.add('hidden');
+      document.getElementById('view-register').classList.add('hidden');
       document.getElementById('view-dashboard').classList.add('hidden');
       document.getElementById('role-super-admin').classList.add('hidden');
       document.getElementById('role-teacher').classList.add('hidden');
@@ -753,6 +866,8 @@
 
       if (viewName === 'LOGIN') {
         document.getElementById('view-login').classList.remove('hidden');
+      } else if (viewName === 'REGISTER') {
+        document.getElementById('view-register').classList.remove('hidden');
       } else {
         document.getElementById('view-dashboard').classList.remove('hidden');
         const boardSection = document.getElementById(`role-${viewName.toLowerCase().replace(/_/g, '-')}`);

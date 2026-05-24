@@ -8,8 +8,8 @@ export async function onRequest(context) {
   const { request, env } = context;
   const url = new URL(request.url);
 
-  // Bypass authentication checks for the login endpoint
-  if (url.pathname === '/api/auth/login') {
+  // Bypass authentication checks for the login and register endpoints
+  if (url.pathname === '/api/auth/login' || url.pathname === '/api/auth/register') {
     return await context.next();
   }
 

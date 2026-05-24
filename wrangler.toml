@@ -4,4 +4,4 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "profilestudent-db"
-database_id = "YOUR-D1-DATABASE-UUID-HERE"
+database_id = "ae6ffbef-5195-4238-be8b-7f14e2b18a30"
