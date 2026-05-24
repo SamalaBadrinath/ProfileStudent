@@ -27,6 +27,8 @@ CREATE TABLE users (
     name TEXT NOT NULL,
     role TEXT NOT NULL CHECK(role IN ('SUPER_ADMIN', 'TEACHER', 'FEE_COUNTER', 'LIBRARIAN', 'CUSTOM')),
     custom_role_scope TEXT,
+    password_hash TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY(school_id) REFERENCES schools(id) ON DELETE CASCADE,
     UNIQUE(school_id, email), -- Restricts a user email to a single role per school

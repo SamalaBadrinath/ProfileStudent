@@ -1,3 +1,7 @@
+function bufToHex(buffer) {
+  return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   const db = env.DB;
@@ -34,22 +38,44 @@ export async function onRequestPost(context) {
       );
     }
 
-    // 2. Generate UUIDs for the new school and administrator
+    // 2. Hash the password using PBKDF2 SHA-256 with 100k iterations
+    const encoder = new TextEncoder();
+    const passwordBuffer = encoder.encode(password);
+    const key = await crypto.subtle.importKey(
+      "raw",
+      passwordBuffer,
+      "PBKDF2",
+      false,
+      ["deriveBits"]
+    );
+
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const hashBuffer = await crypto.subtle.deriveBits(
+      {
+        name: "PBKDF2",
+        salt: saltBytes,
+        iterations: 100000,
+        hash: "SHA-256"
+      },
+      key,
+      256
+    );
+
+    const passwordHash = bufToHex(hashBuffer);
+    const passwordSalt = bufToHex(saltBytes);
+
+    // 3. Generate UUIDs for the new school and administrator
     const schoolId = crypto.randomUUID();
     const userId = crypto.randomUUID();
 
-    // 3. Execute batched D1 transaction (all or nothing)
+    // 4. Execute batched D1 transaction (all or nothing)
     await db.batch([
       db.prepare('INSERT INTO schools (id, name) VALUES (?, ?)').bind(schoolId, schoolName),
       db.prepare(
-        `INSERT INTO users (id, school_id, email, name, role, custom_role_scope)
-         VALUES (?, ?, ?, ?, 'SUPER_ADMIN', NULL)`
-      ).bind(userId, schoolId, email, adminName)
+        `INSERT INTO users (id, school_id, email, name, role, custom_role_scope, password_hash, password_salt)
+         VALUES (?, ?, ?, ?, 'SUPER_ADMIN', NULL, ?, ?)`
+      ).bind(userId, schoolId, email, adminName, passwordHash, passwordSalt)
     ]);
-
-    // PRODUCTION PASSWORD NOTICE:
-    // In production, you would hash the password (e.g. using bcrypt/argon2) and save it.
-    // E.g., INSERT INTO users (..., password_hash) VALUES (..., hashed_password);
 
     return new Response(
       JSON.stringify({

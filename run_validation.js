@@ -6,17 +6,17 @@ const execAsync = promisify(exec);
 const testCases = [
   {
     name: '1. Invalid role check constraint (VISITOR role)',
-    sql: `INSERT INTO users (id, school_id, email, name, role, custom_role_scope) VALUES ('bad-user-1', '11111111-1111-1111-1111-111111111111', 'bad1@oakridge.edu', 'Bad User', 'VISITOR', NULL);`,
+    sql: `INSERT INTO users (id, school_id, email, name, role, custom_role_scope, password_hash, password_salt) VALUES ('bad-user-1', '11111111-1111-1111-1111-111111111111', 'bad1@oakridge.edu', 'Bad User', 'VISITOR', NULL, 'hash', 'salt');`,
     expectedError: 'CHECK constraint failed'
   },
   {
     name: '2. Custom user missing custom_role_scope',
-    sql: `INSERT INTO users (id, school_id, email, name, role, custom_role_scope) VALUES ('bad-user-2', '11111111-1111-1111-1111-111111111111', 'bad2@oakridge.edu', 'Bad User 2', 'CUSTOM', NULL);`,
+    sql: `INSERT INTO users (id, school_id, email, name, role, custom_role_scope, password_hash, password_salt) VALUES ('bad-user-2', '11111111-1111-1111-1111-111111111111', 'bad2@oakridge.edu', 'Bad User 2', 'CUSTOM', NULL, 'hash', 'salt');`,
     expectedError: 'CHECK constraint failed'
   },
   {
     name: '3. Non-custom user with custom_role_scope set',
-    sql: `INSERT INTO users (id, school_id, email, name, role, custom_role_scope) VALUES ('bad-user-3', '11111111-1111-1111-1111-111111111111', 'bad3@oakridge.edu', 'Bad User 3', 'TEACHER', 'MATH');`,
+    sql: `INSERT INTO users (id, school_id, email, name, role, custom_role_scope, password_hash, password_salt) VALUES ('bad-user-3', '11111111-1111-1111-1111-111111111111', 'bad3@oakridge.edu', 'Bad User 3', 'TEACHER', 'MATH', 'hash', 'salt');`,
     expectedError: 'CHECK constraint failed'
   },
   {
